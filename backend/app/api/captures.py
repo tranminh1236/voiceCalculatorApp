@@ -3,11 +3,13 @@ import uuid
 from pathlib import Path
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
-from app.api.deps import get_db, get_ocr_service
+from app.api.deps import get_db, get_ocr_service, get_stt_service
 from app.config import settings
-from app.models import Template, Capture, OcrNumber
-from app.schemas import CaptureOut, OcrNumberOut, BBoxOut
+from app.models import Template, Capture, OcrNumber, AudioGroup
+from app.schemas import CaptureOut, OcrNumberOut, BBoxOut, AudioGroupOut
 from app.services.ocr import OcrService
+from app.services.stt import SttService
+from app.services.audio import transcribe_and_parse
 
 
 router = APIRouter(prefix="/api/captures", tags=["captures"])
@@ -129,3 +131,64 @@ def get_capture(capture_id: int, db: Session = Depends(get_db)) -> CaptureOut:
         raise HTTPException(status_code=404, detail="capture not found")
     rows = db.query(OcrNumber).filter(OcrNumber.capture_id == c.id).all()
     return _capture_to_out(c, rows)
+
+
+def _multiplier_for_group(template_groups_json: str, group_index: int) -> float | None:
+    groups = json.loads(template_groups_json)
+    for g in groups:
+        if int(g["index"]) == group_index:
+            return float(g["multiplier"])
+    return None
+
+
+@router.post("/{capture_id}/audio", response_model=AudioGroupOut, status_code=status.HTTP_201_CREATED)
+def upload_audio(
+    capture_id: int,
+    group_index: int = Form(...),
+    audio: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    stt: SttService = Depends(get_stt_service),
+) -> AudioGroupOut:
+    c = db.get(Capture, capture_id)
+    if c is None:
+        raise HTTPException(status_code=404, detail="capture not found")
+
+    t = db.get(Template, c.template_id)
+    if t is None:
+        raise HTTPException(status_code=500, detail="template missing for capture")
+
+    multiplier = _multiplier_for_group(t.groups_json, group_index)
+    if multiplier is None:
+        raise HTTPException(status_code=400, detail=f"group_index {group_index} not in template")
+
+    Path(settings.media_dir, "audio").mkdir(parents=True, exist_ok=True)
+    fname = f"{uuid.uuid4().hex}_g{group_index}.webm"
+    fpath = Path(settings.media_dir, "audio", fname)
+    audio_bytes = audio.file.read()
+    fpath.write_bytes(audio_bytes)
+
+    pipeline_result = transcribe_and_parse(audio_bytes, stt)
+
+    row = AudioGroup(
+        capture_id=capture_id,
+        group_index=group_index,
+        audio_path=str(fpath),
+        transcript=pipeline_result.transcript,
+        parsed_numbers_json=json.dumps(pipeline_result.parsed_numbers),
+        sum=pipeline_result.sum,
+        multiplier_snapshot=multiplier,
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+
+    return AudioGroupOut(
+        id=row.id,
+        capture_id=row.capture_id,
+        group_index=row.group_index,
+        audio_path=row.audio_path,
+        transcript=row.transcript,
+        parsed_numbers=pipeline_result.parsed_numbers,
+        sum=row.sum,
+        multiplier_snapshot=row.multiplier_snapshot,
+    )
