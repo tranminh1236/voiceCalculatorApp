@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     db_path: str = str(BACKEND_ROOT / "data" / "voiceapp.db")
     media_dir: str = str(BACKEND_ROOT / "data" / "media")
     cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    use_real_services: bool = False
+    whisper_model_name: str = "small"  # tiny | base | small | medium | large
+    whisper_language: str = "vi"
+    paddle_lang: str = "vi"
 
     @property
     def db_url(self) -> str:

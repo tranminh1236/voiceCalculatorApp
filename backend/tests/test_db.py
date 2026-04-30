@@ -8,6 +8,10 @@ def test_settings_defaults():
     s = Settings()
     assert s.db_path.endswith("voiceapp.db")
     assert s.media_dir.endswith("media")
+    assert s.use_real_services is False
+    assert s.whisper_model_name == "small"
+    assert s.whisper_language == "vi"
+    assert s.paddle_lang == "vi"
 
 
 def test_engine_creates_sqlite_file(tmp_path: Path):
