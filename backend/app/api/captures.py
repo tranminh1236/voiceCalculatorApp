@@ -347,3 +347,14 @@ def finalize_capture(capture_id: int, db: Session = Depends(get_db)) -> CaptureO
 
     rows = db.query(OcrNumber).filter(OcrNumber.capture_id == c.id).all()
     return _capture_to_out(c, rows)
+
+
+@router.delete("/{capture_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_capture(capture_id: int, db: Session = Depends(get_db)):
+    c = db.get(Capture, capture_id)
+    if c is None:
+        raise HTTPException(status_code=404, detail="capture not found")
+    db.delete(c)
+    db.commit()
+    # Note: image + audio files on disk are NOT deleted in this version.
+    # Acceptable for personal scale; can add cleanup task later.
