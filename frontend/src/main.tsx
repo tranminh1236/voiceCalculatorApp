@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Templates from './pages/Templates'
 import NewCapture from './pages/NewCapture'
+import CaptureDetail from './pages/CaptureDetail'
 import App from './App'
 import './styles/globals.css'
 
@@ -33,6 +34,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route index element={<Home />} />
             <Route path="templates" element={<Templates />} />
             <Route path="captures/new" element={<NewCapture />} />
+            <Route path="captures/:id" element={<CaptureDetail />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
