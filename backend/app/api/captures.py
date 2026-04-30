@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db, get_ocr_service, get_stt_service
 from app.config import settings
 from app.models import Template, Capture, OcrNumber, AudioGroup, Match
-from app.schemas import CaptureOut, OcrNumberOut, BBoxOut, AudioGroupOut, MatchOut, OcrCorrectionIn, MatchActionIn
+from app.schemas import CaptureOut, OcrNumberOut, BBoxOut, AudioGroupOut, MatchOut, OcrCorrectionIn, MatchActionIn, CaptureMetadataIn
 from app.services.matcher import match_numbers
 from app.services.ocr import OcrService
 from app.services.stt import SttService
@@ -358,3 +358,30 @@ def delete_capture(capture_id: int, db: Session = Depends(get_db)):
     db.commit()
     # Note: image + audio files on disk are NOT deleted in this version.
     # Acceptable for personal scale; can add cleanup task later.
+
+
+@router.patch("/{capture_id}/metadata", response_model=CaptureOut)
+def patch_metadata(
+    capture_id: int,
+    body: CaptureMetadataIn,
+    db: Session = Depends(get_db),
+) -> CaptureOut:
+    c = db.get(Capture, capture_id)
+    if c is None:
+        raise HTTPException(status_code=404, detail="capture not found")
+
+    # Only update fields that were explicitly provided (use model_fields_set)
+    provided = body.model_fields_set
+    if "writer_name" in provided:
+        c.writer_name = body.writer_name
+    if "note_date" in provided:
+        c.note_date = body.note_date
+    if "tags" in provided:
+        c.tags_json = json.dumps(body.tags) if body.tags is not None else None
+    if "notes" in provided:
+        c.notes = body.notes
+
+    db.commit()
+    db.refresh(c)
+    rows = db.query(OcrNumber).filter(OcrNumber.capture_id == c.id).all()
+    return _capture_to_out(c, rows)

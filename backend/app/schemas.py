@@ -116,3 +116,10 @@ class MatchActionIn(BaseModel):
     ocr_number_id: int
     audio_group_id: int
     action: str  # 'add' | 'remove'
+
+
+class CaptureMetadataIn(BaseModel):
+    writer_name: str | None = None
+    note_date: str | None = None  # YYYY-MM-DD
+    tags: list[str] | None = None
+    notes: str | None = None
