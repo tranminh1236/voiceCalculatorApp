@@ -56,3 +56,20 @@ def test_parse_tens(phrase, expected):
 ])
 def test_parse_hundreds(phrase, expected):
     assert parse_number_word(phrase) == expected
+
+
+@pytest.mark.parametrize("phrase,expected", [
+    ("một nghìn", 1000),
+    ("một nghìn không trăm năm mươi", 1050),
+    ("một nghìn không trăm lẻ năm", 1005),
+    ("hai nghìn rưỡi", 2500),
+    ("ba trăm rưỡi", 350),
+    ("mười rưỡi", 10.5),
+    ("một triệu", 1_000_000),
+    ("một tỷ", 1_000_000_000),
+    ("hai phẩy năm", 2.5),
+    ("không phẩy một", 0.1),
+    ("âm năm", -5),
+])
+def test_parse_thousands_and_specials(phrase, expected):
+    assert parse_number_word(phrase) == pytest.approx(expected)
