@@ -50,3 +50,17 @@ def test_capture_create_meta_rejects_empty_province_list_per_group():
 def test_province_out():
     p = ProvinceOut(code="HN", region="mb", name="Hà Nội")
     assert p.code == "HN"
+
+
+def test_audio_group_out_minimal():
+    from app.schemas import AudioGroupOut
+    g = AudioGroupOut(
+        id=1, capture_id=10, group_index=2,
+        audio_path="/tmp/a.webm",
+        transcript="hai mươi ba bằng",
+        parsed_numbers=[23],
+        sum=23.0,
+        multiplier_snapshot=80.0,
+    )
+    assert g.parsed_numbers == [23]
+    assert g.sum == 23.0

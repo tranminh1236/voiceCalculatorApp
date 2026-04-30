@@ -83,3 +83,15 @@ class CaptureOut(BaseModel):
     ocr_numbers: list[OcrNumberOut] = []
     created_at: datetime
     updated_at: datetime
+
+
+class AudioGroupOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    capture_id: int
+    group_index: int
+    audio_path: str
+    transcript: str | None
+    parsed_numbers: list[float] | None
+    sum: float | None
+    multiplier_snapshot: float
