@@ -1,0 +1,4 @@
+data/voiceapp.db
+data/voiceapp.db-journal
+data/media/
+*.log
