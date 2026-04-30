@@ -97,6 +97,22 @@ export async function finalizeCapture(captureId: number): Promise<Capture> {
   return r.data
 }
 
+export interface CaptureMetadataInput {
+  writer_name?: string | null
+  note_date?: string | null
+  tags?: string[] | null
+  notes?: string | null
+}
+
+export async function patchCaptureMetadata(captureId: number, body: CaptureMetadataInput): Promise<Capture> {
+  const r = await api.patch<Capture>(`/captures/${captureId}/metadata`, body)
+  return r.data
+}
+
+export async function deleteCapture(captureId: number): Promise<void> {
+  await api.delete(`/captures/${captureId}`)
+}
+
 /**
  * Convert a backend image_path (absolute filesystem path on the server)
  * into a URL the browser can fetch via the /media static mount.
