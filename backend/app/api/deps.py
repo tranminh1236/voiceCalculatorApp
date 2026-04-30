@@ -2,7 +2,7 @@ from collections.abc import Generator
 from sqlalchemy.orm import Session
 from app.db import make_engine, make_session_factory
 from app.config import settings, Settings
-from app.services.ocr import OcrService, StubOcrService, PaddleOcrService
+from app.services.ocr import OcrService, StubOcrService, PaddleOcrService, EasyOcrService
 from app.services.stt import SttService, StubSttService, WhisperSttService
 
 
@@ -17,9 +17,11 @@ def get_db() -> Generator[Session, None, None]:
 
 def get_ocr_service() -> OcrService:
     _settings = Settings()
-    if _settings.use_real_services:
+    if not _settings.use_real_services:
+        return StubOcrService()
+    if _settings.ocr_backend == "paddle":
         return PaddleOcrService(lang=_settings.paddle_lang)
-    return StubOcrService()
+    return EasyOcrService(lang=_settings.paddle_lang)
 
 
 def get_stt_service() -> SttService:

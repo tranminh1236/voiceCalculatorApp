@@ -99,3 +99,47 @@ class PaddleOcrService:
                 confidence=float(conf),
             ))
         return detections
+
+
+class EasyOcrService:
+    """OcrService backed by EasyOCR (PyTorch-based). Lazy-loads model on first call.
+
+    Recommended over PaddleOcrService on macOS arm64 because PaddlePaddle
+    inference is extremely slow on Apple Silicon (no MPS support). EasyOCR
+    uses PyTorch which has solid Apple Silicon support and runs ~5-30x faster
+    on the same hardware.
+    """
+
+    def __init__(self, lang: str = "vi") -> None:
+        # EasyOCR Reader takes a list of language codes
+        self._langs = [lang] if isinstance(lang, str) else list(lang)
+
+    def _run_easyocr(self, image_bytes: bytes) -> list:
+        """Call EasyOCR Reader.readtext(). Isolated for monkey-patching in tests."""
+        import cv2
+        import numpy as np
+        from app.services._model_cache import get_easyocr
+        arr = np.frombuffer(image_bytes, dtype=np.uint8)
+        img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+        if img is None:
+            return []
+        reader = get_easyocr(self._langs)
+        return reader.readtext(img)
+
+    def extract(self, image_bytes: bytes) -> list[OcrDetection]:
+        raw = self._run_easyocr(image_bytes)
+
+        detections: list[OcrDetection] = []
+        for entry in raw:
+            # EasyOCR returns: [bbox_4_corners, text, confidence]
+            corners, text, conf = entry
+            value = _parse_numeric(text)
+            if value is None:
+                continue
+            detections.append(OcrDetection(
+                bbox=_bbox_from_corners(corners),
+                raw_text=text,
+                value=value,
+                confidence=float(conf),
+            ))
+        return detections

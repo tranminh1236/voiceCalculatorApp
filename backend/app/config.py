@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     media_dir: str = str(BACKEND_ROOT / "data" / "media")
     cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
     use_real_services: bool = False
+    ocr_backend: str = "easyocr"  # easyocr | paddle (easyocr default — much faster on Apple Silicon)
     whisper_model_name: str = "small"  # tiny | base | small | medium | large
     whisper_language: str = "vi"
     paddle_lang: str = "vi"
