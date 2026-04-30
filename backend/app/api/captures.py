@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db, get_ocr_service, get_stt_service
 from app.config import settings
 from app.models import Template, Capture, OcrNumber, AudioGroup, Match
-from app.schemas import CaptureOut, OcrNumberOut, BBoxOut, AudioGroupOut, MatchOut
+from app.schemas import CaptureOut, OcrNumberOut, BBoxOut, AudioGroupOut, MatchOut, OcrCorrectionIn
 from app.services.matcher import match_numbers
 from app.services.ocr import OcrService
 from app.services.stt import SttService
@@ -224,4 +224,30 @@ def upload_audio(
         sum=row.sum,
         multiplier_snapshot=row.multiplier_snapshot,
         matches=[MatchOut.model_validate(m) for m in match_rows],
+    )
+
+
+@router.patch("/{capture_id}/ocr/{ocr_id}", response_model=OcrNumberOut)
+def patch_ocr(
+    capture_id: int,
+    ocr_id: int,
+    body: OcrCorrectionIn,
+    db: Session = Depends(get_db),
+) -> OcrNumberOut:
+    c = db.get(Capture, capture_id)
+    if c is None:
+        raise HTTPException(status_code=404, detail="capture not found")
+    n = db.get(OcrNumber, ocr_id)
+    if n is None or n.capture_id != capture_id:
+        raise HTTPException(status_code=404, detail="ocr number not found in capture")
+    n.corrected_value = body.corrected_value
+    db.commit()
+    db.refresh(n)
+    return OcrNumberOut(
+        id=n.id,
+        bbox=BBoxOut(x=n.bbox_x, y=n.bbox_y, w=n.bbox_w, h=n.bbox_h),
+        raw_text=n.raw_text,
+        raw_value=n.raw_value,
+        corrected_value=n.corrected_value,
+        confidence=n.confidence,
     )

@@ -105,3 +105,7 @@ class AudioGroupOut(BaseModel):
     sum: float | None
     multiplier_snapshot: float
     matches: list[MatchOut] = []
+
+
+class OcrCorrectionIn(BaseModel):
+    corrected_value: float | None  # None to clear correction
