@@ -1,5 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useCapture } from '../hooks/useCapture'
+import OcrOverlay from '../components/OcrOverlay'
+import { getImageURL } from '../api/client'
 
 export default function CaptureDetail() {
   const { id } = useParams<{ id: string }>()
@@ -27,10 +29,23 @@ export default function CaptureDetail() {
         {capture.final_value !== null && <> · final: <strong>{capture.final_value.toLocaleString()}</strong></>}
       </div>
 
-      {/* OCR overlay + group panels rendered in subsequent tasks */}
-      <pre className="text-xs bg-slate-800 p-2 rounded overflow-auto max-h-96">
-        {JSON.stringify({ ocr_numbers: capture.ocr_numbers, audio_groups: capture.audio_groups }, null, 2)}
-      </pre>
+      <div className="grid lg:grid-cols-2 gap-4">
+        <div>
+          <OcrOverlay
+            imageUrl={getImageURL(capture.image_path)}
+            ocrNumbers={capture.ocr_numbers}
+          />
+        </div>
+        <div className="text-xs">
+          <details className="bg-slate-800 p-2 rounded">
+            <summary className="cursor-pointer">Raw JSON (debug)</summary>
+            <pre className="overflow-auto max-h-96">{JSON.stringify({
+              ocr_numbers: capture.ocr_numbers,
+              audio_groups: capture.audio_groups,
+            }, null, 2)}</pre>
+          </details>
+        </div>
+      </div>
     </div>
   )
 }
