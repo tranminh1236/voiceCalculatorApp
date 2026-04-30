@@ -20,6 +20,28 @@ router = APIRouter(prefix="/api/captures", tags=["captures"])
 def _capture_to_out(c: Capture, ocr_rows: list[OcrNumber]) -> CaptureOut:
     raw_gp = json.loads(c.group_provinces_json)
     group_provinces: dict[int, list[str]] = {int(k): v for k, v in raw_gp.items()}
+
+    # Need a session to load audio_groups + matches. Use object_session() to get the bound session.
+    from sqlalchemy.orm import object_session
+    db = object_session(c)
+    audio_group_rows = db.query(AudioGroup).filter(AudioGroup.capture_id == c.id).order_by(AudioGroup.group_index, AudioGroup.id).all()
+
+    audio_groups_out: list[AudioGroupOut] = []
+    for g in audio_group_rows:
+        match_rows = db.query(Match).filter(Match.audio_group_id == g.id).order_by(Match.id).all()
+        parsed_numbers = json.loads(g.parsed_numbers_json) if g.parsed_numbers_json else None
+        audio_groups_out.append(AudioGroupOut(
+            id=g.id,
+            capture_id=g.capture_id,
+            group_index=g.group_index,
+            audio_path=g.audio_path,
+            transcript=g.transcript,
+            parsed_numbers=parsed_numbers,
+            sum=g.sum,
+            multiplier_snapshot=g.multiplier_snapshot,
+            matches=[MatchOut.model_validate(m) for m in match_rows],
+        ))
+
     return CaptureOut(
         id=c.id,
         template_id=c.template_id,
@@ -42,6 +64,7 @@ def _capture_to_out(c: Capture, ocr_rows: list[OcrNumber]) -> CaptureOut:
             )
             for n in ocr_rows
         ],
+        audio_groups=audio_groups_out,
         created_at=c.created_at,
         updated_at=c.updated_at,
     )

@@ -81,6 +81,7 @@ class CaptureOut(BaseModel):
     tags: list[str] | None
     notes: str | None
     ocr_numbers: list[OcrNumberOut] = []
+    audio_groups: list[AudioGroupOut] = []
     created_at: datetime
     updated_at: datetime
 
