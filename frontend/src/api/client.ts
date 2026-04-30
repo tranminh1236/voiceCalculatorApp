@@ -1,6 +1,16 @@
 import axios from 'axios'
 import type { Template, Capture, Province, GroupDef, AudioGroup, OcrNumber, MatchRecord } from './types'
 
+function backendOrigin(): string {
+  const envBase = import.meta.env.VITE_API_BASE_URL
+  if (!envBase || envBase.startsWith('/')) {
+    // proxied through vite — same origin
+    return ''
+  }
+  // strip trailing /api if present
+  return envBase.replace(/\/api\/?$/, '')
+}
+
 const baseURL = import.meta.env.VITE_API_BASE_URL ?? '/api'
 
 export const api = axios.create({
@@ -85,4 +95,17 @@ export async function toggleMatch(captureId: number, body: {
 export async function finalizeCapture(captureId: number): Promise<Capture> {
   const r = await api.post<Capture>(`/captures/${captureId}/finalize`)
   return r.data
+}
+
+/**
+ * Convert a backend image_path (absolute filesystem path on the server)
+ * into a URL the browser can fetch via the /media static mount.
+ */
+export function getImageURL(imagePath: string): string {
+  // image_path looks like /Users/.../backend/data/media/captures/<uuid>.png
+  // Extract everything after "/media/" → "captures/<uuid>.png"
+  const idx = imagePath.indexOf('/media/')
+  if (idx === -1) return imagePath
+  const rel = imagePath.slice(idx + '/media/'.length)
+  return `${backendOrigin()}/media/${rel}`
 }
