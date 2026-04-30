@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useCapture, usePatchOcr, useUploadAudio } from '../hooks/useCapture'
 import { useTemplates } from '../hooks/useTemplates'
 import OcrOverlay from '../components/OcrOverlay'
 import OcrCorrectionInput from '../components/OcrCorrectionInput'
 import GroupPanel from '../components/GroupPanel'
 import FinalizeButton from '../components/FinalizeButton'
+import CaptureMetadataForm from '../components/CaptureMetadataForm'
+import ConfirmModal from '../components/ConfirmModal'
+import { useDeleteCapture } from '../hooks/useCaptures'
 import { getImageURL } from '../api/client'
 
 export default function CaptureDetail() {
@@ -17,6 +20,9 @@ export default function CaptureDetail() {
   const uploadAudio = useUploadAudio(captureId ?? 0)
   const { data: templates } = useTemplates()
   const template = templates?.find((t) => t.id === capture?.template_id)
+  const navigate = useNavigate()
+  const deleteMutation = useDeleteCapture()
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   if (isLoading) return <div className="text-slate-300">Loading...</div>
   if (error) return <div className="text-red-400">{(error as Error).message}</div>
@@ -101,6 +107,37 @@ export default function CaptureDetail() {
         </div>
       </div>
       <FinalizeButton capture={capture} />
+
+      <CaptureMetadataForm capture={capture} />
+
+      <div className="bg-slate-800 p-3 rounded flex justify-between items-center">
+        <span className="text-sm text-slate-400">
+          Created: {new Date(capture.created_at).toLocaleString()}
+        </span>
+        <button
+          type="button"
+          onClick={() => setShowDeleteConfirm(true)}
+          className="px-3 py-1 text-red-400 hover:bg-red-900/30 rounded"
+        >
+          Xóa capture
+        </button>
+      </div>
+
+      {showDeleteConfirm && (
+        <ConfirmModal
+          title="Xóa capture?"
+          message={`Capture #${capture.id} và toàn bộ OCR + audio + matches sẽ bị xóa khỏi DB. (File ảnh + audio trên đĩa giữ lại.) Hành động này không thể hoàn tác.`}
+          confirmLabel="Xóa"
+          destructive
+          isPending={deleteMutation.isPending}
+          onCancel={() => setShowDeleteConfirm(false)}
+          onConfirm={() => {
+            deleteMutation.mutate(capture.id, {
+              onSuccess: () => navigate('/captures'),
+            })
+          }}
+        />
+      )}
     </div>
   )
 }
