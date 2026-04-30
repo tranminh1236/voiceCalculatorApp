@@ -41,3 +41,18 @@ def test_parse_teens(phrase, expected):
 ])
 def test_parse_tens(phrase, expected):
     assert parse_number_word(phrase) == expected
+
+
+@pytest.mark.parametrize("phrase,expected", [
+    ("một trăm", 100),
+    ("hai trăm", 200),
+    ("một trăm lẻ năm", 105),
+    ("một trăm linh năm", 105),
+    ("trăm lẻ năm", 105),
+    ("một trăm hai mươi ba", 123),
+    ("chín trăm chín mươi chín", 999),
+    ("một trăm mười", 110),
+    ("một trăm mười tám", 118),
+])
+def test_parse_hundreds(phrase, expected):
+    assert parse_number_word(phrase) == expected
