@@ -26,3 +26,27 @@ def db_session(engine):
     SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
     with SessionLocal() as s:
         yield s
+
+
+@pytest.fixture
+def client(engine, db_session):
+    """TestClient with DB and stub services injected."""
+    from fastapi.testclient import TestClient
+    from app.main import create_app
+    from app.api.deps import get_db, get_ocr_service, get_stt_service
+    from app.services.ocr import StubOcrService
+    from app.services.stt import StubSttService
+
+    app = create_app()
+
+    def _get_db():
+        yield db_session
+
+    app.dependency_overrides[get_db] = _get_db
+    app.dependency_overrides[get_ocr_service] = lambda: StubOcrService()
+    app.dependency_overrides[get_stt_service] = lambda: StubSttService()
+
+    with TestClient(app) as c:
+        yield c
+
+    app.dependency_overrides.clear()
