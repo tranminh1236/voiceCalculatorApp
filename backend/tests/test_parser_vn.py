@@ -73,3 +73,51 @@ def test_parse_hundreds(phrase, expected):
 ])
 def test_parse_thousands_and_specials(phrase, expected):
     assert parse_number_word(phrase) == pytest.approx(expected)
+
+
+def test_parse_expression_basic():
+    nums, total = parse_expression("hai mươi ba cộng năm cộng mười hai bằng")
+    assert nums == [23, 5, 12]
+    assert total == 40
+
+
+def test_parse_expression_with_hundreds_and_terminator():
+    nums, total = parse_expression("hai mươi ba cộng năm cộng mười hai cộng trăm lẻ năm cộng mười tám bằng")
+    assert nums == [23, 5, 12, 105, 18]
+    assert total == 163
+
+
+def test_parse_expression_no_terminator():
+    nums, total = parse_expression("một cộng hai cộng ba")
+    assert nums == [1, 2, 3]
+    assert total == 6
+
+
+def test_parse_expression_terminator_tong():
+    nums, total = parse_expression("một cộng hai tổng")
+    assert nums == [1, 2]
+    assert total == 3
+
+
+def test_parse_expression_terminator_equal_sign():
+    nums, total = parse_expression("một cộng hai =")
+    assert nums == [1, 2]
+    assert total == 3
+
+
+def test_parse_expression_punctuation_stripped():
+    nums, total = parse_expression("một, cộng. hai!")
+    assert nums == [1, 2]
+    assert total == 3
+
+
+def test_parse_expression_repeated_for_2a_rule():
+    """Group rule '2a + 2c' is read as repeating the value twice."""
+    nums, total = parse_expression("hai mươi ba cộng hai mươi ba cộng mười hai cộng mười hai bằng")
+    assert nums == [23, 23, 12, 12]
+    assert total == 70
+
+
+def test_parse_expression_empty_raises():
+    with pytest.raises(ValueError):
+        parse_expression("")

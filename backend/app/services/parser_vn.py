@@ -1,6 +1,8 @@
 """Vietnamese number-word parser — full implementation."""
 from __future__ import annotations
 
+import re
+
 _DIGITS: dict[str, int] = {
     "không": 0, "một": 1, "hai": 2, "ba": 3, "bốn": 4,
     "năm": 5, "sáu": 6, "bảy": 7, "tám": 8, "chín": 9,
@@ -139,6 +141,45 @@ def parse_number_word(text: str) -> float:
     return _parse_positive(tokens)
 
 
+_DELIMITERS = {"cộng", "+", "và", "với"}
+_TERMINATORS = {"bằng", "=", "tổng", "kết", "thúc"}
+_PUNCT_RE = re.compile(r"[,.!?;:]")
+
+
 def parse_expression(text: str) -> tuple[list[float], float]:
-    """Parse expression. Implemented in Task 13."""
-    raise NotImplementedError
+    """Parse 'A cộng B cộng C bằng' into ([A,B,C], sum)."""
+    text = _PUNCT_RE.sub(" ", text)
+    text = _normalize(text)
+    if not text:
+        raise ValueError("empty expression")
+
+    tokens = text.split()
+    cut_idx = None
+    for i, t in enumerate(tokens):
+        if t in _TERMINATORS:
+            cut_idx = i
+            break
+    if cut_idx is not None:
+        tokens = tokens[:cut_idx]
+    if not tokens:
+        raise ValueError("no number tokens before terminator")
+
+    parts: list[list[str]] = []
+    current: list[str] = []
+    for t in tokens:
+        if t in _DELIMITERS:
+            if current:
+                parts.append(current)
+                current = []
+        else:
+            current.append(t)
+    if current:
+        parts.append(current)
+
+    if not parts:
+        raise ValueError("no parseable parts")
+
+    numbers: list[float] = []
+    for part in parts:
+        numbers.append(parse_number_word(" ".join(part)))
+    return numbers, sum(numbers)
