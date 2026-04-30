@@ -1,12 +1,14 @@
 import json
 import uuid
 from pathlib import Path
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.api.deps import get_db, get_ocr_service, get_stt_service
 from app.config import settings
-from app.models import Template, Capture, OcrNumber, AudioGroup
-from app.schemas import CaptureOut, OcrNumberOut, BBoxOut, AudioGroupOut
+from app.models import Template, Capture, OcrNumber, AudioGroup, Match
+from app.schemas import CaptureOut, OcrNumberOut, BBoxOut, AudioGroupOut, MatchOut
+from app.services.matcher import match_numbers
 from app.services.ocr import OcrService
 from app.services.stt import SttService
 from app.services.audio import transcribe_and_parse
@@ -179,8 +181,38 @@ def upload_audio(
         multiplier_snapshot=multiplier,
     )
     db.add(row)
+    db.flush()  # need row.id for matches
+
+    # Auto-match: gather OCR numbers for this capture + existing match counts (across other groups)
+    ocr_rows = db.query(OcrNumber).filter(OcrNumber.capture_id == capture_id).all()
+    ocr_pairs = [
+        (n.id, n.corrected_value if n.corrected_value is not None else n.raw_value)
+        for n in ocr_rows
+        if (n.corrected_value is not None or n.raw_value is not None)
+    ]
+    existing_counts = dict(
+        db.query(Match.ocr_number_id, func.count(Match.id))
+        .group_by(Match.ocr_number_id)
+        .all()
+    )
+    proposals = match_numbers(pipeline_result.parsed_numbers, ocr_pairs, existing_counts)
+
+    match_rows: list[Match] = []
+    for prop in proposals:
+        if prop.ocr_id is None:
+            continue
+        m = Match(
+            ocr_number_id=prop.ocr_id,
+            audio_group_id=row.id,
+            confidence=prop.confidence,
+            source="auto",
+        )
+        db.add(m)
+        match_rows.append(m)
     db.commit()
     db.refresh(row)
+    for m in match_rows:
+        db.refresh(m)
 
     return AudioGroupOut(
         id=row.id,
@@ -191,4 +223,5 @@ def upload_audio(
         parsed_numbers=pipeline_result.parsed_numbers,
         sum=row.sum,
         multiplier_snapshot=row.multiplier_snapshot,
+        matches=[MatchOut.model_validate(m) for m in match_rows],
     )

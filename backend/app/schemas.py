@@ -85,6 +85,15 @@ class CaptureOut(BaseModel):
     updated_at: datetime
 
 
+class MatchOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    ocr_number_id: int
+    audio_group_id: int
+    confidence: float | None
+    source: str  # 'auto' | 'manual'
+
+
 class AudioGroupOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
@@ -95,3 +104,4 @@ class AudioGroupOut(BaseModel):
     parsed_numbers: list[float] | None
     sum: float | None
     multiplier_snapshot: float
+    matches: list[MatchOut] = []
