@@ -109,3 +109,9 @@ class AudioGroupOut(BaseModel):
 
 class OcrCorrectionIn(BaseModel):
     corrected_value: float | None  # None to clear correction
+
+
+class MatchActionIn(BaseModel):
+    ocr_number_id: int
+    audio_group_id: int
+    action: str  # 'add' | 'remove'

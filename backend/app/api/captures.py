@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db, get_ocr_service, get_stt_service
 from app.config import settings
 from app.models import Template, Capture, OcrNumber, AudioGroup, Match
-from app.schemas import CaptureOut, OcrNumberOut, BBoxOut, AudioGroupOut, MatchOut, OcrCorrectionIn
+from app.schemas import CaptureOut, OcrNumberOut, BBoxOut, AudioGroupOut, MatchOut, OcrCorrectionIn, MatchActionIn
 from app.services.matcher import match_numbers
 from app.services.ocr import OcrService
 from app.services.stt import SttService
@@ -251,3 +251,54 @@ def patch_ocr(
         corrected_value=n.corrected_value,
         confidence=n.confidence,
     )
+
+
+@router.post("/{capture_id}/matches", response_model=MatchOut)
+def toggle_match(
+    capture_id: int,
+    body: MatchActionIn,
+    response: Response,
+    db: Session = Depends(get_db),
+) -> MatchOut:
+    c = db.get(Capture, capture_id)
+    if c is None:
+        raise HTTPException(status_code=404, detail="capture not found")
+
+    if body.action not in ("add", "remove"):
+        raise HTTPException(status_code=400, detail="action must be 'add' or 'remove'")
+
+    # Validate ocr/audio_group belong to this capture
+    n = db.get(OcrNumber, body.ocr_number_id)
+    if n is None or n.capture_id != capture_id:
+        raise HTTPException(status_code=404, detail="ocr number not found in capture")
+    g = db.get(AudioGroup, body.audio_group_id)
+    if g is None or g.capture_id != capture_id:
+        raise HTTPException(status_code=404, detail="audio group not found in capture")
+
+    if body.action == "add":
+        m = Match(
+            ocr_number_id=body.ocr_number_id,
+            audio_group_id=body.audio_group_id,
+            confidence=1.0,
+            source="manual",
+        )
+        db.add(m)
+        db.commit()
+        db.refresh(m)
+        response.status_code = 201
+        return MatchOut.model_validate(m)
+    else:  # remove
+        # Remove the most recent match for this pair (LIFO behavior — same OCR may match same group N times)
+        m = (
+            db.query(Match)
+            .filter(Match.ocr_number_id == body.ocr_number_id,
+                    Match.audio_group_id == body.audio_group_id)
+            .order_by(Match.id.desc())
+            .first()
+        )
+        if m is None:
+            raise HTTPException(status_code=404, detail="no match exists for this ocr/audio_group")
+        snapshot = MatchOut.model_validate(m)
+        db.delete(m)
+        db.commit()
+        return snapshot
