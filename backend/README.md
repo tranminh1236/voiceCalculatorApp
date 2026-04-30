@@ -12,6 +12,8 @@ pip install -r requirements.txt
 pip install -r requirements-dev.txt
 ```
 
+**System dependency:** `ffmpeg` must be installed (Whisper uses it for audio decoding). On macOS: `brew install ffmpeg`.
+
 ## Run
 
 ```bash
