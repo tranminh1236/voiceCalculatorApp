@@ -5,6 +5,7 @@ import { useTemplates } from '../hooks/useTemplates'
 import OcrOverlay from '../components/OcrOverlay'
 import OcrCorrectionInput from '../components/OcrCorrectionInput'
 import GroupPanel from '../components/GroupPanel'
+import FinalizeButton from '../components/FinalizeButton'
 import { getImageURL } from '../api/client'
 
 export default function CaptureDetail() {
@@ -99,6 +100,7 @@ export default function CaptureDetail() {
           )}
         </div>
       </div>
+      <FinalizeButton capture={capture} />
     </div>
   )
 }

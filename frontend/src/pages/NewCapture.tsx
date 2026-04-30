@@ -1,15 +1,15 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTemplates } from '../hooks/useTemplates'
 import { useCreateCapture } from '../hooks/useCaptures'
 import CameraCapture from '../components/CameraCapture'
-import type { Capture } from '../api/types'
 
 export default function NewCapture() {
   const { data: templates, isLoading } = useTemplates()
   const createMutation = useCreateCapture()
+  const navigate = useNavigate()
   const [templateId, setTemplateId] = useState<number | null>(null)
   const [groupProvinces, setGroupProvinces] = useState<Record<number, string[]>>({})
-  const [result, setResult] = useState<Capture | null>(null)
 
   const selectedTemplate = templates?.find((t) => t.id === templateId)
 
@@ -39,7 +39,7 @@ export default function NewCapture() {
       group_provinces: groupProvinces,
       image: blob,
     })
-    setResult(cap)
+    navigate(`/captures/${cap.id}`)
   }
 
   return (
@@ -87,22 +87,6 @@ export default function NewCapture() {
         </section>
       )}
 
-      {result && (
-        <section className="space-y-2">
-          <h2 className="font-semibold">4. Kết quả OCR</h2>
-          <div className="bg-slate-800 p-3 rounded">
-            <div className="text-sm text-slate-400">Capture id: {result.id} (status: {result.status})</div>
-            <ul className="mt-2 space-y-1">
-              {result.ocr_numbers.map((n) => (
-                <li key={n.id}>
-                  <span className="font-mono">{n.raw_value ?? n.raw_text}</span>
-                  <span className="text-slate-400 text-xs ml-2">conf={n.confidence?.toFixed(2)}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
     </div>
   )
 }
