@@ -302,3 +302,25 @@ def toggle_match(
         db.delete(m)
         db.commit()
         return snapshot
+
+
+@router.post("/{capture_id}/finalize", response_model=CaptureOut)
+def finalize_capture(capture_id: int, db: Session = Depends(get_db)) -> CaptureOut:
+    c = db.get(Capture, capture_id)
+    if c is None:
+        raise HTTPException(status_code=404, detail="capture not found")
+    if c.status != "draft":
+        raise HTTPException(status_code=400, detail=f"capture status is '{c.status}', not 'draft'")
+
+    audio_groups = db.query(AudioGroup).filter(AudioGroup.capture_id == capture_id).all()
+    if not audio_groups:
+        raise HTTPException(status_code=400, detail="capture has no audio groups; cannot finalize")
+
+    final_value = sum((g.sum or 0.0) * g.multiplier_snapshot for g in audio_groups)
+    c.final_value = final_value
+    c.status = "final"
+    db.commit()
+    db.refresh(c)
+
+    rows = db.query(OcrNumber).filter(OcrNumber.capture_id == c.id).all()
+    return _capture_to_out(c, rows)
