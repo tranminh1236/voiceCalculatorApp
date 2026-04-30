@@ -34,6 +34,15 @@ def create_app() -> FastAPI:
     def health():
         return {"status": "ok"}
 
+    from app.api.provinces import router as provinces_router
+    app.include_router(provinces_router)
+
+    from app.api.templates import router as templates_router
+    app.include_router(templates_router)
+
+    from app.api.captures import router as captures_router
+    app.include_router(captures_router)
+
     return app
 
 
