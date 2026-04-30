@@ -35,8 +35,6 @@ class StubOcrService:
 
 
 import re
-import tempfile
-from pathlib import Path
 
 _NUMBER_RE = re.compile(r"^-?\d+(?:[.,]\d+)?$")
 
@@ -66,20 +64,24 @@ class PaddleOcrService:
     def __init__(self, lang: str = "vi") -> None:
         self._lang = lang
 
-    def _run_paddle(self, image_path: str) -> list:
-        """Call into PaddleOCR. Isolated for monkey-patching in tests."""
+    def _run_paddle(self, image_bytes: bytes) -> list:
+        """Decode bytes → numpy array → call PaddleOCR. Isolated for monkey-patching in tests.
+
+        We decode in-memory rather than via tempfile because PaddleOCR's tempfile
+        path silently fails on macOS arm64 (returns None from cv2.imread).
+        """
+        import cv2
+        import numpy as np
         from app.services._model_cache import get_paddle_ocr
+        arr = np.frombuffer(image_bytes, dtype=np.uint8)
+        img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+        if img is None:
+            return [None]
         ocr = get_paddle_ocr(lang=self._lang)
-        return ocr.ocr(image_path, cls=False)
+        return ocr.ocr(img, cls=False)
 
     def extract(self, image_bytes: bytes) -> list[OcrDetection]:
-        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
-            f.write(image_bytes)
-            tmp_path = f.name
-        try:
-            raw = self._run_paddle(tmp_path)
-        finally:
-            Path(tmp_path).unlink(missing_ok=True)
+        raw = self._run_paddle(image_bytes)
 
         if not raw or raw[0] is None:
             return []
