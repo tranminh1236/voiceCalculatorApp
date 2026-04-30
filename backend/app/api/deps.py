@@ -1,9 +1,9 @@
 from collections.abc import Generator
 from sqlalchemy.orm import Session
 from app.db import make_engine, make_session_factory
-from app.config import settings
-from app.services.ocr import OcrService, StubOcrService
-from app.services.stt import SttService, StubSttService
+from app.config import settings, Settings
+from app.services.ocr import OcrService, StubOcrService, PaddleOcrService
+from app.services.stt import SttService, StubSttService, WhisperSttService
 
 
 _engine = make_engine(settings.db_url)
@@ -16,10 +16,19 @@ def get_db() -> Generator[Session, None, None]:
 
 
 def get_ocr_service() -> OcrService:
+    _settings = Settings()
+    if _settings.use_real_services:
+        return PaddleOcrService(lang=_settings.paddle_lang)
     return StubOcrService()
 
 
 def get_stt_service() -> SttService:
+    _settings = Settings()
+    if _settings.use_real_services:
+        return WhisperSttService(
+            model_name=_settings.whisper_model_name,
+            language=_settings.whisper_language,
+        )
     return StubSttService()
 
 
