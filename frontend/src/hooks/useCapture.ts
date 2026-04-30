@@ -5,6 +5,8 @@ import {
   uploadAudio,
   toggleMatch,
   finalizeCapture,
+  patchCaptureMetadata,
+  type CaptureMetadataInput,
 } from '../api/client'
 
 export function useCapture(captureId: number | null) {
@@ -50,5 +52,16 @@ export function useFinalizeCapture(captureId: number) {
   return useMutation({
     mutationFn: () => finalizeCapture(captureId),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['capture', captureId] }),
+  })
+}
+
+export function useUpdateMetadata(captureId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (body: CaptureMetadataInput) => patchCaptureMetadata(captureId, body),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['capture', captureId] })
+      qc.invalidateQueries({ queryKey: ['captures'] })
+    },
   })
 }
