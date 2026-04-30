@@ -84,3 +84,28 @@ class Match(Base):
     __table_args__ = (
         CheckConstraint("source IN ('auto','manual')", name="ck_match_source"),
     )
+
+
+class LotteryDraw(Base):
+    __tablename__ = "lottery_draws"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    province_code: Mapped[str] = mapped_column(ForeignKey("provinces.code"), nullable=False)
+    draw_date: Mapped[str] = mapped_column(String(10), nullable=False)
+    source_image_path: Mapped[str | None] = mapped_column(Text, nullable=True)
+    prizes_json: Mapped[str] = mapped_column(Text, nullable=False)
+    tails_2d_json: Mapped[str] = mapped_column(Text, nullable=False)
+    special_tail_2d: Mapped[int] = mapped_column(Integer, nullable=False)
+    __table_args__ = (
+        UniqueConstraint("province_code", "draw_date", name="uq_lottery_province_date"),
+    )
+
+
+class CaptureResult(Base):
+    __tablename__ = "capture_results"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    capture_id: Mapped[int] = mapped_column(ForeignKey("captures.id", ondelete="CASCADE"), nullable=False, unique=True)
+    hits_json: Mapped[str] = mapped_column(Text, nullable=False)
+    total_stake: Mapped[float] = mapped_column(Float, nullable=False)
+    winning_total_payout: Mapped[float] = mapped_column(Float, nullable=False)
+    profit_loss: Mapped[float] = mapped_column(Float, nullable=False)
+    settled_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
