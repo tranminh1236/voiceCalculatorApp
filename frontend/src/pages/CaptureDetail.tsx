@@ -1,12 +1,16 @@
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useCapture } from '../hooks/useCapture'
+import { useCapture, usePatchOcr } from '../hooks/useCapture'
 import OcrOverlay from '../components/OcrOverlay'
+import OcrCorrectionInput from '../components/OcrCorrectionInput'
 import { getImageURL } from '../api/client'
 
 export default function CaptureDetail() {
   const { id } = useParams<{ id: string }>()
   const captureId = id ? parseInt(id) : null
   const { data: capture, isLoading, error } = useCapture(captureId)
+  const [editingOcrId, setEditingOcrId] = useState<number | null>(null)
+  const patchMutation = usePatchOcr(captureId ?? 0)
 
   if (isLoading) return <div className="text-slate-300">Loading...</div>
   if (error) return <div className="text-red-400">{(error as Error).message}</div>
@@ -34,7 +38,29 @@ export default function CaptureDetail() {
           <OcrOverlay
             imageUrl={getImageURL(capture.image_path)}
             ocrNumbers={capture.ocr_numbers}
+            highlightedOcrId={editingOcrId}
+            onOcrClick={(id) => setEditingOcrId(id)}
           />
+          {editingOcrId !== null && (
+            <div className="mt-2">
+              <div className="text-sm text-slate-400 mb-1">Sửa OCR #{editingOcrId}</div>
+              <OcrCorrectionInput
+                initialValue={
+                  capture.ocr_numbers.find((n) => n.id === editingOcrId)?.corrected_value ??
+                  capture.ocr_numbers.find((n) => n.id === editingOcrId)?.raw_value ??
+                  null
+                }
+                isPending={patchMutation.isPending}
+                onSave={(v) => {
+                  patchMutation.mutate(
+                    { ocrId: editingOcrId, value: v },
+                    { onSuccess: () => setEditingOcrId(null) }
+                  )
+                }}
+                onCancel={() => setEditingOcrId(null)}
+              />
+            </div>
+          )}
         </div>
         <div className="text-xs">
           <details className="bg-slate-800 p-2 rounded">
