@@ -1,13 +1,14 @@
 import json
 import uuid
 from pathlib import Path
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Response, UploadFile, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.api.deps import get_db, get_ocr_service, get_stt_service
 from app.config import settings
 from app.models import Template, Capture, OcrNumber, AudioGroup, Match
-from app.schemas import CaptureOut, OcrNumberOut, BBoxOut, AudioGroupOut, MatchOut, OcrCorrectionIn, MatchActionIn, CaptureMetadataIn
+from app.schemas import CaptureOut, OcrNumberOut, BBoxOut, AudioGroupOut, MatchOut, OcrCorrectionIn, MatchActionIn, CaptureMetadataIn, RiskReportOut, RiskEntryOut
+from app.services.risk import compute_risk, RiskInput, AudioGroupInput as RiskAudioGroupInput
 from app.services.matcher import match_numbers
 from app.services.ocr import OcrService
 from app.services.stt import SttService
@@ -385,3 +386,41 @@ def patch_metadata(
     db.refresh(c)
     rows = db.query(OcrNumber).filter(OcrNumber.capture_id == c.id).all()
     return _capture_to_out(c, rows)
+
+
+@router.get("/{capture_id}/risk", response_model=RiskReportOut)
+def get_capture_risk(
+    capture_id: int,
+    threshold: float = Query(default=0.0),
+    db: Session = Depends(get_db),
+) -> RiskReportOut:
+    c = db.get(Capture, capture_id)
+    if c is None:
+        raise HTTPException(status_code=404, detail="capture not found")
+
+    group_provinces_raw = json.loads(c.group_provinces_json)
+    group_provinces = {int(k): v for k, v in group_provinces_raw.items()}
+
+    audio_rows = db.query(AudioGroup).filter(AudioGroup.capture_id == capture_id).order_by(
+        AudioGroup.group_index, AudioGroup.id
+    ).all()
+
+    inputs: list[RiskAudioGroupInput] = []
+    for g in audio_rows:
+        parsed = json.loads(g.parsed_numbers_json) if g.parsed_numbers_json else []
+        inputs.append(RiskAudioGroupInput(
+            group_index=g.group_index,
+            multiplier=g.multiplier_snapshot,
+            provinces=group_provinces.get(g.group_index, []),
+            parsed_numbers=parsed,
+        ))
+
+    report = compute_risk(RiskInput(groups=inputs, threshold=threshold))
+    return RiskReportOut(
+        capture_id=capture_id,
+        total_capital=report.total_capital,
+        threshold=report.threshold,
+        take_count=report.take_count,
+        pass_count=report.pass_count,
+        entries=[RiskEntryOut(**e.__dict__) for e in report.entries],
+    )

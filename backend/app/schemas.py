@@ -123,3 +123,25 @@ class CaptureMetadataIn(BaseModel):
     note_date: str | None = None  # YYYY-MM-DD
     tags: list[str] | None = None
     notes: str | None = None
+
+
+class RiskEntryOut(BaseModel):
+    group_index: int
+    audio_index: int
+    stake: float
+    num_provinces: int
+    effective_stake: float
+    multiplier: float
+    payout_if_hits: float
+    net_if_hits: float
+    capital_share: float
+    recommendation: str
+
+
+class RiskReportOut(BaseModel):
+    capture_id: int
+    total_capital: float
+    threshold: float
+    take_count: int
+    pass_count: int
+    entries: list[RiskEntryOut]
