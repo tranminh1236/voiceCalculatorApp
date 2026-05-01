@@ -10,6 +10,7 @@ import CaptureMetadataForm from '../components/CaptureMetadataForm'
 import ConfirmModal from '../components/ConfirmModal'
 import { useDeleteCapture } from '../hooks/useCaptures'
 import { getImageURL } from '../api/client'
+import RiskPanel from '../components/RiskPanel'
 
 export default function CaptureDetail() {
   const { id } = useParams<{ id: string }>()
@@ -23,6 +24,7 @@ export default function CaptureDetail() {
   const navigate = useNavigate()
   const deleteMutation = useDeleteCapture()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showRisk, setShowRisk] = useState(false)
 
   if (isLoading) return <div className="text-slate-300">Loading...</div>
   if (error) return <div className="text-red-400">{(error as Error).message}</div>
@@ -107,6 +109,17 @@ export default function CaptureDetail() {
         </div>
       </div>
       <FinalizeButton capture={capture} />
+
+      <div className="bg-slate-800 p-3 rounded">
+        <button
+          type="button"
+          onClick={() => setShowRisk((s) => !s)}
+          className="text-sm text-slate-300 hover:text-white"
+        >
+          {showRisk ? '▼ Risk analysis' : '▶ Risk analysis'}
+        </button>
+      </div>
+      {showRisk && <RiskPanel captureId={capture.id} />}
 
       <CaptureMetadataForm capture={capture} />
 
