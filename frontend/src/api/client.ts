@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { Template, Capture, Province, GroupDef, AudioGroup, OcrNumber, MatchRecord } from './types'
+import type { Template, Capture, Province, GroupDef, AudioGroup, OcrNumber, MatchRecord, RiskReport } from './types'
 
 function backendOrigin(): string {
   const envBase = import.meta.env.VITE_API_BASE_URL
@@ -111,6 +111,11 @@ export async function patchCaptureMetadata(captureId: number, body: CaptureMetad
 
 export async function deleteCapture(captureId: number): Promise<void> {
   await api.delete(`/captures/${captureId}`)
+}
+
+export async function getCaptureRisk(captureId: number, threshold: number = 0): Promise<RiskReport> {
+  const r = await api.get<RiskReport>(`/captures/${captureId}/risk`, { params: { threshold } })
+  return r.data
 }
 
 /**

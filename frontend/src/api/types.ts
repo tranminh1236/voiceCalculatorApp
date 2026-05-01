@@ -79,3 +79,25 @@ export interface Capture {
   created_at: string
   updated_at: string
 }
+
+export interface RiskEntry {
+  group_index: number
+  audio_index: number
+  stake: number
+  num_provinces: number
+  effective_stake: number
+  multiplier: number
+  payout_if_hits: number
+  net_if_hits: number
+  capital_share: number
+  recommendation: 'take' | 'pass'
+}
+
+export interface RiskReport {
+  capture_id: number
+  total_capital: number
+  threshold: number
+  take_count: number
+  pass_count: number
+  entries: RiskEntry[]
+}

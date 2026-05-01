@@ -6,6 +6,7 @@ import {
   toggleMatch,
   finalizeCapture,
   patchCaptureMetadata,
+  getCaptureRisk,
   type CaptureMetadataInput,
 } from '../api/client'
 
@@ -63,5 +64,13 @@ export function useUpdateMetadata(captureId: number) {
       qc.invalidateQueries({ queryKey: ['capture', captureId] })
       qc.invalidateQueries({ queryKey: ['captures'] })
     },
+  })
+}
+
+export function useCaptureRisk(captureId: number | null, threshold: number) {
+  return useQuery({
+    queryKey: ['capture-risk', captureId, threshold],
+    queryFn: () => getCaptureRisk(captureId as number, threshold),
+    enabled: captureId !== null,
   })
 }
