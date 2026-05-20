@@ -1,0 +1,122 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - link "VoiceApp" [ref=e5] [cursor=pointer]:
+      - /url: /
+    - link "New Capture" [ref=e6] [cursor=pointer]:
+      - /url: /captures/new
+    - link "History" [ref=e7] [cursor=pointer]:
+      - /url: /captures
+    - link "Templates" [ref=e8] [cursor=pointer]:
+      - /url: /templates
+  - main [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - 'heading "Capture #5" [level=1] [ref=e12]'
+        - generic [ref=e13]: "status: final"
+      - generic [ref=e14]:
+        - text: "Template #3 · 3 OCR · 1 audio groups · final:"
+        - strong [ref=e15]: 10,640
+      - generic [ref=e16]:
+        - img "capture" [ref=e19]
+        - generic [ref=e22]:
+          - generic [ref=e23]:
+            - heading "Lô MB(lo × 80)" [level=3] [ref=e24]:
+              - text: Lô MB
+              - generic [ref=e25]: (lo × 80)
+            - generic [ref=e26]: 1 bản ghi
+          - button "Ghi âm" [ref=e29] [cursor=pointer]: Ghi âm
+          - generic [ref=e31]:
+            - generic [ref=e32]: "Transcript: hai mươi ba cộng năm cộng một trăm lẻ năm bằng"
+            - generic [ref=e33]:
+              - text: "Numbers: 23 + 5 + 105 ="
+              - strong [ref=e34]: "133"
+            - generic [ref=e35]: "2 matches: 5(a), 105(a)"
+      - generic [ref=e36]:
+        - generic [ref=e37]: Capture đã được finalize.
+        - generic [ref=e38]: "Final value: 10,640"
+      - button "▼ Risk analysis" [ref=e40] [cursor=pointer]
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - heading "Risk analysis" [level=3] [ref=e43]
+          - generic [ref=e115]:
+            - text: "Vốn:"
+            - strong [ref=e116]: "133"
+            - text: ·
+            - generic [ref=e117]: 0 take
+            - text: /
+            - generic [ref=e118]: 3 pass
+        - generic [ref=e48]:
+          - generic [ref=e49]: "Ngưỡng lãi tối thiểu:"
+          - spinbutton [ref=e50]: "1000000"
+          - button "hòa vốn" [ref=e51] [cursor=pointer]
+          - button "100,000" [ref=e52] [cursor=pointer]
+          - button "500,000" [ref=e53] [cursor=pointer]
+          - button "1,000,000" [active] [ref=e54] [cursor=pointer]
+        - table [ref=e120]:
+          - rowgroup [ref=e121]:
+            - row "Group Stake ×Đài Eff. ×Mult Payout Net nếu trúng % vốn Khuyến nghị" [ref=e122]:
+              - columnheader "Group" [ref=e123]
+              - columnheader "Stake" [ref=e124]
+              - columnheader "×Đài" [ref=e125]
+              - columnheader "Eff." [ref=e126]
+              - columnheader "×Mult" [ref=e127]
+              - columnheader "Payout" [ref=e128]
+              - columnheader "Net nếu trúng" [ref=e129]
+              - columnheader "% vốn" [ref=e130]
+              - columnheader "Khuyến nghị" [ref=e131]
+          - rowgroup [ref=e132]:
+            - row "G1 23 1 23 ×80 1,840 +1,707 17.3% PASS" [ref=e133]:
+              - cell "G1" [ref=e134]
+              - cell "23" [ref=e135]
+              - cell "1" [ref=e136]
+              - cell "23" [ref=e137]
+              - cell "×80" [ref=e138]
+              - cell "1,840" [ref=e139]
+              - cell "+1,707" [ref=e140]
+              - cell "17.3%" [ref=e141]
+              - cell "PASS" [ref=e142]
+            - row "G1 5 1 5 ×80 400 +267 3.8% PASS" [ref=e143]:
+              - cell "G1" [ref=e144]
+              - cell "5" [ref=e145]
+              - cell "1" [ref=e146]
+              - cell "5" [ref=e147]
+              - cell "×80" [ref=e148]
+              - cell "400" [ref=e149]
+              - cell "+267" [ref=e150]
+              - cell "3.8%" [ref=e151]
+              - cell "PASS" [ref=e152]
+            - row "G1 105 1 105 ×80 8,400 +8,267 78.9% PASS" [ref=e153]:
+              - cell "G1" [ref=e154]
+              - cell "105" [ref=e155]
+              - cell "1" [ref=e156]
+              - cell "105" [ref=e157]
+              - cell "×80" [ref=e158]
+              - cell "8,400" [ref=e159]
+              - cell "+8,267" [ref=e160]
+              - cell "78.9%" [ref=e161]
+              - cell "PASS" [ref=e162]
+      - generic [ref=e99]:
+        - heading "Metadata" [level=3] [ref=e100]
+        - generic [ref=e101]:
+          - generic [ref=e102]:
+            - text: Writer
+            - textbox "Writer" [ref=e103]:
+              - /placeholder: Tên người ghi
+              - text: Smoke Test
+          - generic [ref=e104]:
+            - text: Note date
+            - textbox "Note date" [ref=e105]: 2026-04-29
+        - generic [ref=e106]:
+          - text: Tags (comma-separated)
+          - textbox "Tags (comma-separated)" [ref=e107]:
+            - /placeholder: weekly, lottery, ...
+            - text: testing, e2e
+        - generic [ref=e108]:
+          - text: Notes
+          - textbox "Notes" [ref=e109]:
+            - /placeholder: Ghi chú tự do...
+            - text: Plan 6 verification
+        - button "Lưu metadata" [ref=e111] [cursor=pointer]
+      - generic [ref=e112]:
+        - generic [ref=e113]: "Created: 4/30/2026, 3:21:44 PM"
+        - button "Xóa capture" [ref=e114] [cursor=pointer]

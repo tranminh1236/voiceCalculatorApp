@@ -1,0 +1,50 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - link "VoiceApp" [ref=e5] [cursor=pointer]:
+      - /url: /
+    - link "New Capture" [ref=e6] [cursor=pointer]:
+      - /url: /captures/new
+    - link "History" [ref=e7] [cursor=pointer]:
+      - /url: /captures
+    - link "Templates" [ref=e8] [cursor=pointer]:
+      - /url: /templates
+  - main [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - 'heading "Capture #1" [level=1] [ref=e12]'
+        - generic [ref=e13]: "status: draft"
+      - generic [ref=e14]: "Template #1 · 3 OCR · 0 audio groups"
+      - generic [ref=e15]:
+        - img "capture" [ref=e18]
+        - generic [ref=e21]:
+          - generic [ref=e22]:
+            - heading "L(lo × 80)" [level=3] [ref=e23]:
+              - text: L
+              - generic [ref=e24]: (lo × 80)
+            - generic [ref=e25]: 0 bản ghi
+          - button "Ghi âm" [ref=e28] [cursor=pointer]: Ghi âm
+      - generic [ref=e30]:
+        - button "Finalize" [disabled] [ref=e31]
+        - generic [ref=e32]: Cần ghi âm ít nhất 1 group trước khi finalize.
+      - generic [ref=e33]:
+        - heading "Metadata" [level=3] [ref=e34]
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - text: Writer
+            - textbox "Writer" [ref=e37]:
+              - /placeholder: Tên người ghi
+          - generic [ref=e38]:
+            - text: Note date
+            - textbox "Note date" [ref=e39]
+        - generic [ref=e40]:
+          - text: Tags (comma-separated)
+          - textbox "Tags (comma-separated)" [ref=e41]:
+            - /placeholder: weekly, lottery, ...
+        - generic [ref=e42]:
+          - text: Notes
+          - textbox "Notes" [ref=e43]:
+            - /placeholder: Ghi chú tự do...
+        - button "Lưu metadata" [ref=e45] [cursor=pointer]
+      - generic [ref=e46]:
+        - generic [ref=e47]: "Created: 4/30/2026, 12:06:33 PM"
+        - button "Xóa capture" [ref=e48] [cursor=pointer]

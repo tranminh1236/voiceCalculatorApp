@@ -1,0 +1,34 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - link "VoiceApp" [ref=e5] [cursor=pointer]:
+      - /url: /
+    - link "Templates" [ref=e6] [cursor=pointer]:
+      - /url: /templates
+    - link "New Capture" [ref=e7] [cursor=pointer]:
+      - /url: /captures/new
+  - main [ref=e8]:
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - 'heading "Capture #5" [level=1] [ref=e11]'
+        - generic [ref=e12]: "status: final"
+      - generic [ref=e13]:
+        - text: "Template #3 · 3 OCR · 1 audio groups · final:"
+        - strong [ref=e36]: 10,640
+      - generic [ref=e14]:
+        - img "capture" [ref=e17]
+        - generic [ref=e20]:
+          - generic [ref=e21]:
+            - heading "Lô MB(lo × 80)" [level=3] [ref=e22]:
+              - text: Lô MB
+              - generic [ref=e23]: (lo × 80)
+            - generic [ref=e24]: 1 bản ghi
+          - button "Ghi âm" [ref=e27] [cursor=pointer]: Ghi âm
+          - generic [ref=e29]:
+            - generic [ref=e30]: "Transcript: hai mươi ba cộng năm cộng một trăm lẻ năm bằng"
+            - generic [ref=e31]:
+              - text: "Numbers: 23 + 5 + 105 ="
+              - strong [ref=e32]: "133"
+            - generic [ref=e33]: "2 matches: 5(a), 105(a)"
+      - generic [ref=e34]:
+        - generic [ref=e37]: Capture đã được finalize.
+        - generic [ref=e38]: "Final value: 10,640"

@@ -1,0 +1,41 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - link "VoiceApp" [ref=e5] [cursor=pointer]:
+      - /url: /
+    - link "Templates" [ref=e6] [cursor=pointer]:
+      - /url: /templates
+    - link "New Capture" [ref=e7] [cursor=pointer]:
+      - /url: /captures/new
+  - main [ref=e8]:
+    - generic [ref=e12]:
+      - heading "Templates" [level=1] [ref=e13]
+      - generic [ref=e14]:
+        - heading "Tạo template mới" [level=2] [ref=e15]
+        - textbox "Tên template" [ref=e16]
+        - generic [ref=e17]:
+          - textbox "Label" [ref=e18]: Lô
+          - combobox [ref=e19]:
+            - option "lo" [selected]
+            - option "de"
+            - option "xien_2"
+            - option "xien_3"
+            - option "xien_4"
+            - option "3cang"
+            - option "xien_quay"
+          - spinbutton [ref=e20]: "80"
+          - textbox "Provinces (comma)" [ref=e21]: HN
+        - generic [ref=e22]:
+          - button "+ Group" [ref=e23] [cursor=pointer]
+          - button "Tạo" [ref=e24] [cursor=pointer]
+      - generic [ref=e25]:
+        - heading "Danh sách" [level=2] [ref=e26]
+        - list [ref=e27]:
+          - listitem [ref=e34]:
+            - generic [ref=e35]: Lô-Đề-Xiên-Test
+            - generic [ref=e36]: Lô MB(lo×80)
+          - listitem [ref=e28]:
+            - generic [ref=e29]: smoke-real
+            - generic [ref=e30]: L(lo×80)
+          - listitem [ref=e31]:
+            - generic [ref=e32]: smoke
+            - generic [ref=e33]: L(lo×80)

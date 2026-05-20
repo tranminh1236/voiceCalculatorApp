@@ -1,0 +1,26 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - link "VoiceApp" [ref=e5] [cursor=pointer]:
+      - /url: /
+    - link "Templates" [ref=e6] [cursor=pointer]:
+      - /url: /templates
+    - link "New Capture" [ref=e7] [cursor=pointer]:
+      - /url: /captures/new
+  - main [ref=e8]:
+    - generic [ref=e26]:
+      - generic [ref=e27]:
+        - 'heading "Capture #5" [level=1] [ref=e28]'
+        - generic [ref=e29]: "status: draft"
+      - generic [ref=e30]: "Template #3 · 3 OCR · 0 audio groups"
+      - generic [ref=e31]:
+        - img "capture" [ref=e34]
+        - generic [ref=e37]:
+          - generic [ref=e38]:
+            - heading "Lô MB(lo × 80)" [level=3] [ref=e39]:
+              - text: Lô MB
+              - generic [ref=e40]: (lo × 80)
+            - generic [ref=e41]: 0 bản ghi
+          - button "Ghi âm" [ref=e44] [cursor=pointer]: Ghi âm
+      - generic [ref=e46]:
+        - button "Finalize" [disabled] [ref=e47]
+        - generic [ref=e48]: Cần ghi âm ít nhất 1 group trước khi finalize.

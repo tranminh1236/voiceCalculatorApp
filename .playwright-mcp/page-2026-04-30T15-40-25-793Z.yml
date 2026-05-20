@@ -1,0 +1,76 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - link "VoiceApp" [ref=e5] [cursor=pointer]:
+      - /url: /
+    - link "New Capture" [ref=e6] [cursor=pointer]:
+      - /url: /captures/new
+    - link "History" [ref=e7] [cursor=pointer]:
+      - /url: /captures
+    - link "Templates" [ref=e8] [cursor=pointer]:
+      - /url: /templates
+  - main [ref=e9]:
+    - generic [ref=e10]:
+      - heading "History" [level=1] [ref=e11]
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - generic [ref=e14]: Status
+          - combobox "Status" [ref=e15]:
+            - option "all" [selected]
+            - option "draft"
+            - option "final"
+            - option "settled"
+        - generic [ref=e16]:
+          - generic [ref=e17]: Writer contains
+          - textbox "Writer contains" [ref=e18]
+        - generic [ref=e19]:
+          - generic [ref=e20]: Search (id / tags / notes)
+          - textbox "Search (id / tags / notes)" [ref=e21]
+        - generic [ref=e22]: 8/8
+      - list [ref=e23]:
+        - listitem [ref=e24]:
+          - generic [ref=e26]:
+            - 'link "Capture #8" [ref=e27] [cursor=pointer]':
+              - /url: /captures/8
+            - generic [ref=e28]: draft
+        - listitem [ref=e29]:
+          - generic [ref=e31]:
+            - 'link "Capture #7" [ref=e32] [cursor=pointer]':
+              - /url: /captures/7
+            - generic [ref=e33]: draft
+        - listitem [ref=e34]:
+          - generic [ref=e36]:
+            - 'link "Capture #6" [ref=e37] [cursor=pointer]':
+              - /url: /captures/6
+            - generic [ref=e38]: draft
+        - listitem [ref=e39]:
+          - generic [ref=e40]:
+            - generic [ref=e41]:
+              - 'link "Capture #5" [ref=e42] [cursor=pointer]':
+                - /url: /captures/5
+              - generic [ref=e43]: final
+              - generic [ref=e44]: · 2026-04-29
+              - generic [ref=e45]: · Smoke Test
+            - generic [ref=e46]: "#testing #e2e"
+            - generic [ref=e47]:
+              - text: "Final:"
+              - strong [ref=e48]: 10,640
+        - listitem [ref=e49]:
+          - generic [ref=e51]:
+            - 'link "Capture #4" [ref=e52] [cursor=pointer]':
+              - /url: /captures/4
+            - generic [ref=e53]: draft
+        - listitem [ref=e54]:
+          - generic [ref=e56]:
+            - 'link "Capture #3" [ref=e57] [cursor=pointer]':
+              - /url: /captures/3
+            - generic [ref=e58]: draft
+        - listitem [ref=e59]:
+          - generic [ref=e61]:
+            - 'link "Capture #2" [ref=e62] [cursor=pointer]':
+              - /url: /captures/2
+            - generic [ref=e63]: draft
+        - listitem [ref=e64]:
+          - generic [ref=e66]:
+            - 'link "Capture #1" [ref=e67] [cursor=pointer]':
+              - /url: /captures/1
+            - generic [ref=e68]: draft

@@ -1,0 +1,58 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - link "VoiceApp" [ref=e5] [cursor=pointer]:
+      - /url: /
+    - link "New Capture" [ref=e6] [cursor=pointer]:
+      - /url: /captures/new
+    - link "History" [ref=e7] [cursor=pointer]:
+      - /url: /captures
+    - link "Templates" [ref=e8] [cursor=pointer]:
+      - /url: /templates
+  - main [ref=e9]:
+    - generic [ref=e66]:
+      - generic [ref=e67]:
+        - 'heading "Capture #5" [level=1] [ref=e68]'
+        - generic [ref=e69]: "status: final"
+      - generic [ref=e70]:
+        - text: "Template #3 · 3 OCR · 1 audio groups · final:"
+        - strong [ref=e71]: 10,640
+      - generic [ref=e72]:
+        - img "capture" [ref=e75]
+        - generic [ref=e78]:
+          - generic [ref=e79]:
+            - heading "Lô MB(lo × 80)" [level=3] [ref=e80]:
+              - text: Lô MB
+              - generic [ref=e81]: (lo × 80)
+            - generic [ref=e82]: 1 bản ghi
+          - button "Ghi âm" [ref=e85] [cursor=pointer]: Ghi âm
+          - generic [ref=e87]:
+            - generic [ref=e88]: "Transcript: hai mươi ba cộng năm cộng một trăm lẻ năm bằng"
+            - generic [ref=e89]:
+              - text: "Numbers: 23 + 5 + 105 ="
+              - strong [ref=e90]: "133"
+            - generic [ref=e91]: "2 matches: 5(a), 105(a)"
+      - generic [ref=e92]:
+        - generic [ref=e93]: Capture đã được finalize.
+        - generic [ref=e94]: "Final value: 10,640"
+      - generic [ref=e95]:
+        - heading "Metadata" [level=3] [ref=e96]
+        - generic [ref=e97]:
+          - generic [ref=e98]:
+            - text: Writer
+            - textbox "Writer" [ref=e99]:
+              - /placeholder: Tên người ghi
+          - generic [ref=e100]:
+            - text: Note date
+            - textbox "Note date" [ref=e101]
+        - generic [ref=e102]:
+          - text: Tags (comma-separated)
+          - textbox "Tags (comma-separated)" [ref=e103]:
+            - /placeholder: weekly, lottery, ...
+        - generic [ref=e104]:
+          - text: Notes
+          - textbox "Notes" [ref=e105]:
+            - /placeholder: Ghi chú tự do...
+        - button "Lưu metadata" [ref=e107] [cursor=pointer]
+      - generic [ref=e108]:
+        - generic [ref=e109]: "Created: 4/30/2026, 3:21:44 PM"
+        - button "Xóa capture" [ref=e110] [cursor=pointer]
