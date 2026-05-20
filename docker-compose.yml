@@ -1,0 +1,40 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    image: voiceapp-backend:latest
+    container_name: voiceapp-backend
+    environment:
+      VOICEAPP_DB_PATH: /app/data/voiceapp.db
+      VOICEAPP_MEDIA_DIR: /app/data/media
+      VOICEAPP_CORS_ORIGINS: '["http://localhost","http://localhost:5173","http://127.0.0.1"]'
+      VOICEAPP_USE_REAL_SERVICES: "false"
+      VOICEAPP_OCR_BACKEND: easyocr
+      VOICEAPP_WHISPER_MODEL_NAME: small
+      VOICEAPP_WHISPER_LANGUAGE: vi
+    volumes:
+      - backend-data:/app/data
+    ports:
+      - "8070:8070"
+    healthcheck:
+      test: [ "CMD", "curl", "-fsS", "http://localhost:8070/api/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    image: voiceapp-frontend:latest
+    container_name: voiceapp-frontend
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "8090:80"
+    restart: unless-stopped
+
+volumes:
+  backend-data:
